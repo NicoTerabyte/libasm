@@ -39,3 +39,23 @@ Sappiamo sicuro che lavoriamo con l'architettura 86x64 bits, con l'architettura 
 
 Il problema è: come comprendo quando usare **mov**, **lea** ecc, qual'è il processo da seguire per scrivere in assembly? quale logica mi fa utilizzare variabili come rax, rdi, rsi?
 come dico a syscall di fare una determinata azione?
+
+Interessante prima di comprendere il linguaggio una piccola guida mi sta intimando a comprendere bene i calcoli tra i numeri binari le sottrazioni e i numeri negativi quando vengno rappresentati.
+Alla fine ho dovuto lasciare stare la guida perché utilizzava una vecchia architettura a 32 bits e quindi il codice in assembly era completamente diverso.
+Allora parlando con l'intelligenza artificiale ho potuto scoprire lo stile di architettura col quale dobbiamo programmare. IL  quale sarebbe NASM perché viene definito "intel style" e il subject menziona di dover programmare con questo sitle quindi deduco che NASM sia appunta sta cosa qua.
+
+Asselby lavora con un comando built-in chiamato ld
+la sua sintassi è la seguente:
+
+```bash
+ld -o output /lib/crt0.o hello.o -lc
+```
+esso lavora mettendo insieme in questo esempio almeno i due file oggetto /lib/crt0.o hello.o
+La cosa è capire come lavora con questi file oggetto e come ld si relaziona con assembly. Però penso che inerente al suo comportamento basta che sappiamo che si relazioni con i file oggetto.
+
+il ld, è praticamente il nostro compilatore, una sorta di punto di inizio che compila per primo il programma
+In termini tecnici è un entry point e da dove deve iniziare a eseguire il codice o per meglio dire è da dove deve leggerlo, e per definirlo correttamente si utilizza la terminologia **_start** con il suffisso **global** per dire a ld che è quello l'entry point
+
+## Studies todo
+
+- [ ] what is the definition of linker?
