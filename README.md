@@ -56,6 +56,65 @@ La cosa è capire come lavora con questi file oggetto e come ld si relaziona con
 il ld, è praticamente il nostro compilatore, una sorta di punto di inizio che compila per primo il programma
 In termini tecnici è un entry point e da dove deve iniziare a eseguire il codice o per meglio dire è da dove deve leggerlo, e per definirlo correttamente si utilizza la terminologia **_start** con il suffisso **global** per dire a ld che è quello l'entry point
 
+### rdi, rax, rsi
+Starting from a cpu perspective we know that  it is made to perform basic operations for the computer.
+So said operation may be, aritmetical, logical, input/output ones.
+The problem is where is the data of so said actions stored? In the general purpose registers.
+And some of this registers are actually the rdi, rax, and rsi registers that are present to the 64 bits architecture.
+* rax -> handles the system call (syscall) number
+* rdi -> used to pass the **first argument** to a **function**
+* rsi -> used to pass the **second argument** to a **function**
+* rdx -> used to pass the **third argument** to a **function**
+
+
+### small precautions
+We are working with nasm now the old way of compiling that we utilized up there could be defined *wrong* in this case because of the subjects assignement on using nasm and i think that is more correct to use it in this case with assembly too. so yeah this way of compiling:
+```bash
+as asem.s -o asem.o
+```
+is actually wrong instead now to make the file "hello_world.asm" work we do:
+```bash
+nasm -f elf64 -o file.o file.asm
+```
+and this way we create the actual object file for the ld that when used by it, it will create the binary file/executable/input file
+
+```bash
+ld -o programName file.o
+```
+
+and that's it actually
+
+## Torniamo alla speculazione:
+assembly lavora con valori endian. la valutazione in endian determinano l'ordine nel quale il computer i bytes piccolo fact.
+
+Allora cosa interessante nell'architettura 86x64 ci sono dei registri chiamati per essere sempre in quest'ordine i registri che passano dei valori all'interno di una funzione.
+rdi - used to pass the first argument to a function.
+rsi - used to pass the second argument to a function.
+rdx - used to pass the third argument to a function.
+r10 - used to pass the fourth argument to a function.
+r8 - used to pass the fifth argument to a function.
+r9 - used to pass the sixth argument to a function.
+
+Ma questo si applica solamente con le funzioni chiamate tramite syscall che per quello che dobbiamo fare per questo progetto calza a pennello.
+
+**important fact**
+The ELF that we define in a type of file that are compatible with linux.
+
+**What is db?**
+DB - byte - 8 bits
+DW - word - 2 bytes
+DD - doubleword - 4 bytes
+DQ - quadword - 8 bytes
+DT - 10 bytes
+DO - 16 bytes
+DY - 32 bytes
+DZ - 64 bytes
+
+Cioè è come se dicessimo nel codice dove abbiamo utilizzato db che la ogni singola lettera di quella parola equivale ad un byte, questo comporta che prepareremo la parola ad essere grande quanto la sua lunghezza definita grazie a db. Utilizziamo db per definire le nostre variabili
+
 ## Studies todo
 
-- [ ] what is the definition of linker?
+- [x] what is the definition of linker?
+  A linker or link editor is a computer program that combines intermediate software build files such as object and library files into a single executable file such a program or library.
+  Pratically we are using ld to make the object created by nasm into an executable it links together the object file to a program
+- [ ]
