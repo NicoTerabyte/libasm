@@ -84,7 +84,7 @@ ld -o programName file.o
 
 and that's it actually
 
-## Torniamo alla speculazione:
+## Torniamo alla speculazione (passare dati nelle funzioni):
 assembly lavora con valori endian. la valutazione in endian determinano l'ordine nel quale il computer i bytes piccolo fact.
 
 Allora cosa interessante nell'architettura 86x64 ci sono dei registri chiamati per essere sempre in quest'ordine i registri che passano dei valori all'interno di una funzione.
@@ -119,6 +119,13 @@ Cioè è come se dicessimo nel codice dove abbiamo utilizzato db che ogni singol
 Praticamente sarebbe la sezione di memoria che verrebbe interpellata in caso finissimo i _general purpose registers_ uno stack lavora con il sistema LIFO per gestire il flusso di dati che gli vengono inseriti (push) e rimossi (pop).
 Il suo funzionamento è in realtà molto basico. in parole povere serve quando non abbiamo i registri predefiniti per gestire i dati e di conseguenza pushiamo in modo "raw" i dati nello stack, ovviamente questo comporta che dovremmo riprenderceli uno ad uno in un ordine un po' bizzarro che corrisponderebbe all'ultimo numero che è stato inserito nello stack fino al primo segue appunto la struttura LIFO (last in first out)
 
+Come ho menzionato implicitamente prima lo stack inserisce dei dati al suo interno con letteralmente le funzioni **push** e li rimuove con **pop**
+
+
+_importante_
+Lo stack cresce verso il basso non verso l'alto a livello figurativo, in più più roba viene inserita più l'indirizzo è basso? non ho ben capito cosa si intende so solo che si parla del valore dell'address di quel valore inserito nello stack.
+
+
 ## The functions
 Allora le funzioni sono anch'esse un po' particolari. Praticamente la cosa principale è che ogni funzione lavora con due _general purpose registers_
 
@@ -133,8 +140,15 @@ allora questi tre elementi sono particolari e ci sono **SEMPRE** nelle funzioni 
 però approfondiremo domani champ rileggi il capitolo 2 e comprendi appieno rip, rsp e rbp.
 
 Allora l'idea genereale di quei due registri è che rsp ha sempre accesso all'ultima variabile inserita nello stack quindi di per se è un registro dinamico perché è sempre in cambiamento.
-E molto importante, vengono utilizzati all'interno delle funzioni perché di fatto il valore di ritorno all'interno delle suddette viene salvata to nello stack.
+E molto importante, vengono utilizzati all'interno delle funzioni perché di fatto il valore di ritorno all'interno delle suddette viene salvato nello stack.
 Mi sono perso rip da qualche parte ma penso che tra i tre sia quello meno importante
+
+praticamente è come se fosse una lista e rbp fosse **la testa** di questa lista, questo comporta avremo sempre accesso alle variabili all'interno dello stack set uppando rbp all'inizio dello stack della funzione con un push
+poi come accediamo alle variabili è un po' un'altra storia ancora in teoria servirebbe fare un piccolo calcolo con gli indirizzi per essere capaci di accedere ad ogni variabile all'interno dello stack partendo dalla base **cioè rbp**
+
+<span style="color: red">
+porco due mi sono dimenticato che quando lavoriamo coi registri è come se prima di utilizzare call per chiamare una funzione noi stessimo praticamente setuppando gli argomenti che passiamo appunto alla funzione dichiarata da noi, i registri sono gli <b>argomenti cazzzoooooooo</b>
+</span>
 
 ## Sections
 utilized to give instruction to the program, they are mostly used to do different things like for example basic variable declaration or to actually tell to the computer where the program is gonna start.
@@ -145,11 +159,63 @@ some basic sections are the following
 * text - used for the code of the program.
 * shstrtab - stores references to the existing sections.
 
+## Arithmetic calculations:
+Basic list of arithmetic instructions used in assembly
+* ADD - Addition
+* SUB - Subtraction
+* MUL - Unsigned multiplication
+* IMUL - Signed multiplication
+* DIV - Unsigned division
+* IDIV - Signed division
+* INC - Increment
+* DEC - Decrement
+* NEG - Negation
+
+Very simple and chill to use it seems. I'll try to have one file for this kind of exercise though
+
+
+## control flow
+To put it simply is to handle the if elses statement like in the C language.
+
+First of all we use the *cmp* directive to compare the registers with the given value.
+BUT! It can't work by itself because it does the check but it doens't say what to do after, for the result of the control flow statement we need to use other directives.
+Example of cmp usage
+```assembly
+;; Compare the value of the rax register with 50
+cmp rax, 50
+```
+
+
+For handling the "results" we have the **conditional jumps instructions:**
+* JE/JZ - Jump if the values are equal.
+* JNE/JNZ - Jump if the values are not equal.
+* JG - Jump if the first value is greater than the second.
+* JGE - Jump if the first value is greater or equal to the second.
+* JA - The same as JG, but performs the unsigned comparison.
+* JAE - The same as JGE, but performs the unsigned comparison.
+
+In fact we have this C code
+```c
+if (rax != 50) {
+    foo();
+} else {
+    bar();
+}
+```
+that becomes
+```assembly
+;; Compare rax with 50
+cmp rax, 50
+;; Jump to the label `.foo` if the value of the `rax` register is not equal to 50
+jne .foo
+;; Jump to the label `.bar` otherwise
+jmp .bar
+```
 
 ## Studies todo
 
 - [x] what is the definition of linker?
   A linker or link editor is a computer program that combines intermediate software build files such as object and library files into a single executable file such a program or library.
   Pratically we are using ld to make the object created by nasm into an executable it links together the object file to a program
-- [ ] understanding the mechanics of the functions made by yourself in the assembly language
+- [x] understanding the mechanics of the functions made by yourself in the assembly language
 - [ ] creating ft_strlen, it's pratically a test to see if you finally have a grasp of the function creation thing
