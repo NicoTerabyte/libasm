@@ -4,10 +4,10 @@ Getting familiar with assembly language
 ## unknown stuff
 * We can say that the assembly language does work with makefiles
 * What the hell is Deepthough that is mentioned in the subject of the project?
-* How do i write with a 64 bits ASM? and what is the calling convention?
+* How do i write with a 64 bits ASM? (64 is the architecture of the machine) and what is the calling convention?
 * What does doing inline ASM mean? and what are .s files?
-* The code must be compiled with nasm
-* What is the Intel syntax and what is the AT&T syntax that i can't use?
+* The code must be compiled with nasm (correct is the actual compiler of assembly when it doesn't work with C functions)
+* What is the Intel syntax and what is the AT&T syntax that i can't use? (intel syntax is the most "modern" utilized since assembly changes  depending on the processors, AT&T was an old way of writing assembly)
 
 Can it be that the 64 bit programming that got mentioned in the subject is related to the fact that with assembly we are working on cpu's and by consequence the cpu works with 64 bits registers?
 
@@ -20,18 +20,6 @@ What are specifically rax, rdi and rdx?
 are we with lea "variable"? manipulating the output strings?
 
 
-## Command used for compiling:
-this command is for assembling our program
-```bash
-as asem.s -o asem.o
-```
-
-this command is compiling with gcc the object file
-```bash
-gcc -o asem asem.o -nostdlib -static
-```
-
-
 ## Ok torniamo un attimo alla speculazione in italiano va
 La cosa difficile è capire come sta manipolazione di registri ci permetta di fare quello che vogliamo.
 Come le stampe e la manipolazione delle variabili o qualcosa del genere.
@@ -42,9 +30,9 @@ come dico a syscall di fare una determinata azione?
 
 Interessante prima di comprendere il linguaggio una piccola guida mi sta intimando a comprendere bene i calcoli tra i numeri binari le sottrazioni e i numeri negativi quando vengno rappresentati.
 Alla fine ho dovuto lasciare stare la guida perché utilizzava una vecchia architettura a 32 bits e quindi il codice in assembly era completamente diverso.
-Allora parlando con l'intelligenza artificiale ho potuto scoprire lo stile di architettura col quale dobbiamo programmare. IL  quale sarebbe NASM perché viene definito "intel style" e il subject menziona di dover programmare con questo sitle quindi deduco che NASM sia appunta sta cosa qua.
+Allora parlando con l'intelligenza artificiale ho potuto scoprire lo stile di architettura col quale dobbiamo programmare. IL  quale sarebbe NASM perché viene definito "intel style" e il subject menziona di dover programmare con questo sitle quindi deduco che NASM sia appunto sta cosa qua.
 
-Asselby lavora con un comando built-in chiamato ld
+Assembly lavora con un comando built-in chiamato ld
 la sua sintassi è la seguente:
 
 ```bash
@@ -123,11 +111,11 @@ Come ho menzionato implicitamente prima lo stack inserisce dei dati al suo inter
 
 
 _importante_
-Lo stack cresce verso il basso non verso l'alto a livello figurativo, in più più roba viene inserita più l'indirizzo è basso? non ho ben capito cosa si intende so solo che si parla del valore dell'address di quel valore inserito nello stack.
+Lo stack cresce verso il basso non verso l'alto a livello figurativo, in più, più roba viene inserita più l'indirizzo è basso? non ho ben capito cosa si intende so solo che si parla del valore dell'address di quel valore inserito nello stack.
 
 
 ## The functions
-Allora le funzioni sono anch'esse un po' particolari. Praticamente la cosa principale è che ogni funzione lavora con due _general purpose registers_
+Allora le funzioni sono anch'esse un po' particolari. Praticamente la cosa principale è che ogni funzione lavora con due/tre _general purpose registers_
 
 sono tre in particolare
 **rip** - this register is the so-called instruction pointer. It stores the address of the next instruction the CPU is going to execute. When the CPU meets the call instruction to call a function, it pushes the address of the next instruction to run after the function call to the stack. This is done so the CPU knows where to continue the program's execution after the function call.
@@ -158,7 +146,55 @@ L'operazione iniziale che viene spiegata dove rbp all'inizio quindi il *pushing*
 </span>
 
 Essendo che aggiungere valori allo stack li fa andare in indirizzi più bassi per accedere ai registri precedenti l'offset dev'essere negativo sono identificabili come **variabili locali**.
-In sintesi: l'idea sarebbe che il rbp faccia quella determinata azione all'inizio di una funzione perché così negli indirizzi più bassi, cioè quelli negativi, esso abbia le variabili locali cioè quelle salvate dal **caller**, d'altro canto se invece delle variabili venissero salvate nello stack esse sarebbero accessibili solamente tramite un **offset positivo** sommato all'indirizzio di rbp
+In sintesi: l'idea sarebbe che il rbp faccia quella determinata azione all'inizio di una funzione perché così negli indirizzi più bassi, cioè quelli negativi, esso abbia le variabili locali cioè quelle salvate dal **caller**, d'altro canto se invece delle variabili venissero salvate nello stack esse sarebbero accessibili solamente tramite un **offset positivo** sommato all'indirizzo di rbp
+
+## Debugging sheet
+Qui mi segno qualche comando da utilizzare con gdb per capire meglio le operazioni fatte da assembly e non impazzire
+
+Per iniziare dobbiamo compilare quando utilizzamo nasm con la flag -g alla fine perché se no eh so cazzi
+quindi
+
+```bash
+nasm -f elf64 program.asm -o program.o -g
+
+# di seguito creaimo l'eseguibile con ld
+
+ld -o program program.o
+
+#dopo che abbiamo il programma utilizziamo gdb per una questione personale io l'utilizzo così
+gdb -tui -silent program
+```
+quando saremo in gdb ci sono dei comandi che all'interno di esso possiamo fare, essi sono molto utili secondo me
+
+```bash
+#comando che rimuove la parte di codice e la sostituisce con i registri e gli indirizzi di assembly
+(gdb) lay asm
+#rendo visibile la parte dei registri
+(gdb) lay reg
+#inizio il debugging
+(gdb) start
+#esploriamo il codice
+(gdb) si
+```
+
+possiamo anche manipolare il contenuto dei registri in diretta per cambiare il risultato durante l'esecuzione del programma
+
+```bash
+(gdb) set $r10 = 10
+```
+per diciamo includere quel registro dobbiamo per forza utilizzare il $
+
+```bash
+#per vedere i breakpoints disponibili
+(gdb) info break
+```
+
+**extra**
+essendo che gdb lavora con i registri di base con la nomenclatura classica AT&M per cambiarlo ogni volta che viene utilizzato abbiamo fatto un .gdbinit dove abbiamo messo come default startup il comando per vedere con l'architettura intel
+```bash
+set disassembly-flavor intel
+```
+Possiamo anche fare dei comandi personalizzati volendo all'interno del .gdbinit file
 
 ## Sections
 utilized to give instruction to the program, they are mostly used to do different things like for example basic variable declaration or to actually tell to the computer where the program is gonna start.
