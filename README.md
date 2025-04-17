@@ -130,25 +130,35 @@ Lo stack cresce verso il basso non verso l'alto a livello figurativo, in più pi
 Allora le funzioni sono anch'esse un po' particolari. Praticamente la cosa principale è che ogni funzione lavora con due _general purpose registers_
 
 sono tre in particolare
-rip - this register is the so-called instruction pointer. It stores the address of the next instruction the CPU is going to execute. When the CPU meets the call instruction to call a function, it pushes the address of the next instruction to run after the function call to the stack. This is done so the CPU knows where to continue the program's execution after the function call.
+**rip** - this register is the so-called instruction pointer. It stores the address of the next instruction the CPU is going to execute. When the CPU meets the call instruction to call a function, it pushes the address of the next instruction to run after the function call to the stack. This is done so the CPU knows where to continue the program's execution after the function call.
 
-rsp - this register is called a stack pointer and should point to the top of the stack. After we push something to the stack using the push instruction, the stack pointer address decreases. After we pop something from the stack using the pop instruction, the stack pointer address increases.
+**rsp** - this register is called a stack pointer and should point to the top of the stack. After we push something to the stack using the push instruction, the stack pointer address decreases. After we pop something from the stack using the pop instruction, the stack pointer address increases.
 
-rbp - this register is the so-called frame pointer or base pointer that points to the stack frame. As mentioned above, each function has its own stack frame, which is a memory area where the function stores local variables and other data.
+**rbp** - this register is the so-called frame pointer or base pointer that points to the stack frame. As mentioned above, each function has its own stack frame, which is a memory area where the function stores local variables and other data.
 
 allora questi tre elementi sono particolari e ci sono **SEMPRE** nelle funzioni create da noi in linguaggio assembly servono a manipolare uno stack che appunto si crea appositamente per le interazioni che avvengono in quella funzione specifica.
 però approfondiremo domani champ rileggi il capitolo 2 e comprendi appieno rip, rsp e rbp.
 
-Allora l'idea genereale di quei due registri è che rsp ha sempre accesso all'ultima variabile inserita nello stack quindi di per se è un registro dinamico perché è sempre in cambiamento.
+Allora l'idea generale di quei due registri è che rsp ha sempre accesso all'ultima variabile inserita nello stack quindi di per se è un registro dinamico perché è sempre in cambiamento.
 E molto importante, vengono utilizzati all'interno delle funzioni perché di fatto il valore di ritorno all'interno delle suddette viene salvato nello stack.
 Mi sono perso rip da qualche parte ma penso che tra i tre sia quello meno importante
 
-praticamente è come se fosse una lista e rbp fosse **la testa** di questa lista, questo comporta avremo sempre accesso alle variabili all'interno dello stack set uppando rbp all'inizio dello stack della funzione con un push
+praticamente è come se fosse una lista e rbp fosse **la testa** di questa lista, questo comporta che avremo sempre accesso alle variabili all'interno dello stack setuppando rbp all'inizio dello stack della funzione con un push
 poi come accediamo alle variabili è un po' un'altra storia ancora in teoria servirebbe fare un piccolo calcolo con gli indirizzi per essere capaci di accedere ad ogni variabile all'interno dello stack partendo dalla base **cioè rbp**
 
 <span style="color: red">
 porco due mi sono dimenticato che quando lavoriamo coi registri è come se prima di utilizzare call per chiamare una funzione noi stessimo praticamente setuppando gli argomenti che passiamo appunto alla funzione dichiarata da noi, i registri sono gli <b>argomenti cazzzoooooooo</b>
 </span>
+
+### Perché pushare rbp nello stack all'inizio di una funzione?
+L'operazione iniziale che viene spiegata dove rbp all'inizio quindi il *pushing* di rbp nello stack all'inizio di una funzione che viene chiamata è giustificato, praticamente serve a settare rbp per la funzione corrente essendo un registro "locale" viene usato anche prima in un'altra funzione di conseguenza ci salviamo nello stack il punto in cui rbp è arrivato questo comporta che possiamo poi inzializzarlo per utilizzarlo come base all'interno della nuova funzione fare tutte le operazioni necessarie poi resettare tutto "sputandolo" fuori dallo stack con pop.
+
+<span style="color: blue">
+<b>ricorda!</b>
+</span>
+
+Essendo che aggiungere valori allo stack li fa andare in indirizzi più bassi per accedere ai registri precedenti l'offset dev'essere negativo sono identificabili come **variabili locali**.
+In sintesi: l'idea sarebbe che il rbp faccia quella determinata azione all'inizio di una funzione perché così negli indirizzi più bassi, cioè quelli negativi, esso abbia le variabili locali cioè quelle salvate dal **caller**, d'altro canto se invece delle variabili venissero salvate nello stack esse sarebbero accessibili solamente tramite un **offset positivo** sommato all'indirizzio di rbp
 
 ## Sections
 utilized to give instruction to the program, they are mostly used to do different things like for example basic variable declaration or to actually tell to the computer where the program is gonna start.
@@ -218,4 +228,5 @@ jmp .bar
   A linker or link editor is a computer program that combines intermediate software build files such as object and library files into a single executable file such a program or library.
   Pratically we are using ld to make the object created by nasm into an executable it links together the object file to a program
 - [x] understanding the mechanics of the functions made by yourself in the assembly language
+- [ ] fare un printer in assembly is it possible???
 - [ ] creating ft_strlen, it's pratically a test to see if you finally have a grasp of the function creation thing
