@@ -148,6 +148,16 @@ L'operazione iniziale che viene spiegata dove rbp all'inizio quindi il *pushing*
 Essendo che aggiungere valori allo stack li fa andare in indirizzi più bassi per accedere ai registri precedenti l'offset dev'essere negativo sono identificabili come **variabili locali**.
 In sintesi: l'idea sarebbe che il rbp faccia quella determinata azione all'inizio di una funzione perché così negli indirizzi più bassi, cioè quelli negativi, esso abbia le variabili locali cioè quelle salvate dal **caller**, d'altro canto se invece delle variabili venissero salvate nello stack esse sarebbero accessibili solamente tramite un **offset positivo** sommato all'indirizzo di rbp
 
+### Gli offset di rbp
+Allora se capisco questa cosa ho praticamente masterato le funzioni in assembly.
+La domanda è come calcolo l'offset all'interno di rbp per metterci dentro una variabile?
+
+
+### Considerazioni sulle "funzioni" in assembly
+alla fine della giornata le cosidette "funzioni" sono solo delle sezioni, da non confondere con le section stesse, che possiedono una loro "etichetta" (label sarebbe la terminologia adatta), e che vengono chiamate durante l'esecuzione del programma stesso. praticamente quello che succede in assembly è una serie di istruzioni che per conto loro vengono chiamate in determinati ordine
+nel senso: Io devo fare x quindi salto (con jmp) alla sezione x per fare un'operazione che mi serve.
+Poi volendo posso tornare indietro (sempre con jmp jne se c'era un check che è andato male) e ri parto da dove sono saltato andando verso il basso MA questo non mi impedisce di saltare di nuovo in sezione x oppure se operazione y è avvenuta di uscire grazie ad un altro salto. è un po' strano ma già vedendo la logica del codice "stack_training.asm" capirai
+
 ## Debugging sheet
 Qui mi segno qualche comando da utilizzare con gdb per capire meglio le operazioni fatte da assembly e non impazzire
 
@@ -264,5 +274,9 @@ jmp .bar
   A linker or link editor is a computer program that combines intermediate software build files such as object and library files into a single executable file such a program or library.
   Pratically we are using ld to make the object created by nasm into an executable it links together the object file to a program
 - [x] understanding the mechanics of the functions made by yourself in the assembly language
-- [ ] fare un printer in assembly is it possible???
+- [ ] fare un printer in assembly is it possible??? (extra)
 - [ ] creating ft_strlen, it's pratically a test to see if you finally have a grasp of the function creation thing
+
+
+# Avaible "built in" registers
+![alt text](image.png)
