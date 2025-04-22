@@ -13,12 +13,7 @@ Can it be that the 64 bit programming that got mentioned in the subject is relat
 
 I can use something called **mov** values or something to manipulate the memory
 
-syscall can be used to make the computer do some operations when called, prastically the kernel it has defined codes to work out.
-
-What's mov used for? For registers I suppose
-What are specifically rax, rdi and rdx?
-are we with lea "variable"? manipulating the output strings?
-
+syscall can be used to make the computer do some operations when called, pratically the kernel it has defined codes to work out.
 
 ## Ok torniamo un attimo alla speculazione in italiano va
 La cosa difficile è capire come sta manipolazione di registri ci permetta di fare quello che vogliamo.
@@ -30,19 +25,10 @@ come dico a syscall di fare una determinata azione?
 
 Interessante prima di comprendere il linguaggio una piccola guida mi sta intimando a comprendere bene i calcoli tra i numeri binari le sottrazioni e i numeri negativi quando vengno rappresentati.
 Alla fine ho dovuto lasciare stare la guida perché utilizzava una vecchia architettura a 32 bits e quindi il codice in assembly era completamente diverso.
-Allora parlando con l'intelligenza artificiale ho potuto scoprire lo stile di architettura col quale dobbiamo programmare. IL  quale sarebbe NASM perché viene definito "intel style" e il subject menziona di dover programmare con questo sitle quindi deduco che NASM sia appunto sta cosa qua.
+Allora parlando con l'intelligenza artificiale ho potuto scoprire lo stile di architettura col quale dobbiamo programmare. IL  quale sarebbe NASM perché viene definito "intel style" e il subject menziona di dover programmare con questo stile quindi deduco che NASM sia appunto sta cosa qua.
 
 Assembly lavora con un comando built-in chiamato ld
 la sua sintassi è la seguente:
-
-```bash
-ld -o output /lib/crt0.o hello.o -lc
-```
-esso lavora mettendo insieme in questo esempio almeno i due file oggetto /lib/crt0.o hello.o
-La cosa è capire come lavora con questi file oggetto e come ld si relaziona con assembly. Però penso che inerente al suo comportamento basta che sappiamo che si relazioni con i file oggetto.
-
-il ld, è praticamente il nostro compilatore, una sorta di punto di inizio che compila per primo il programma
-In termini tecnici è un entry point e da dove deve iniziare a eseguire il codice o per meglio dire è da dove deve leggerlo, e per definirlo correttamente si utilizza la terminologia **_start** con il suffisso **global** per dire a ld che è quello l'entry point
 
 ### rdi, rax, rsi
 Starting from a cpu perspective we know that  it is made to perform basic operations for the computer.
@@ -236,7 +222,7 @@ To put it simply is to handle the if elses statement like in the C language.
 First of all we use the *cmp* directive to compare the registers with the given value.
 BUT! It can't work by itself because it does the check but it doens't say what to do after, for the result of the control flow statement we need to use other directives.
 Example of cmp usage
-```assembly
+```c
 ;; Compare the value of the rax register with 50
 cmp rax, 50
 ```
