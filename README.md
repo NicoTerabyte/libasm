@@ -254,6 +254,15 @@ jne .foo
 jmp .bar
 ```
 
+## Other stuff concerning the stack in assembly
+Allora, abbiamo scoperto più o meno in generale come funziona lo stack.
+Sappiamo che per esempio con **push** inseriamo dati al suo interno con degli indirizzi bassi e con **pop** sputiamo fuori l'ultimo valore che è stato inserito (LIFO).
+
+Teniamo anche conto di **call** e **ret** però, dove call chiama la procedura richiesta salvando come indirizzo di ritorno dekke istruzioni nello stack. **ret** invece, esce dalla procedura data, modifica lo stack rimuovendo l'indirizzo di ritorno e trasferendo nuovamente il "flow" di esecuzione prima di **call**
+
+## Non solo purpose registers
+
+
 ## Studies todo
 
 - [x] what is the definition of linker?
