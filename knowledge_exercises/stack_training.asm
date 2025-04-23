@@ -128,7 +128,7 @@ printResult:
 	;; Put the number of string characters to the rax register.
 	mov rax, rcx
 	;; Put the value 8 to the rcx register.
-	;mov rcx, 8
+	mov rcx, 1
 	;; Calculate the number of bytes in the given string by multiplying rax by 8.
 	;; The result will be stored in the rax register.
 	mul rcx
@@ -136,7 +136,7 @@ printResult:
 	;; Set the third argument to the length of the result string to print.
 	;; Pay attention even if it written here rdx for this architecture remains
 	;; the THIRD ARGUMENT goddamit
-	mov rdx, rax
+	mov rdx, rcx
 	;; Specify the system call number (1 is `sys_write`).
 	mov rax, SYS_WRITE
 	;; Set the first argument of `sys_write` to 1 (`stdout`).
