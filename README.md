@@ -265,9 +265,6 @@ Teniamo anche conto di **call** e **ret** però, dove call chiama la procedura r
 Un'altra cosa che ho avuto modo di scoprire adesso è che la grande differenza di usare l'istruzione **call** al posto di **jmp** è che in parole povere call lo si utilizza per andare da una parte del codice sapendo che quella parte lì possiede l'indirizzo del chiamante nello stack, di conseguenza quando useremo ret alla fine della funzione o "etichetta" se dobbiamo essere precisi, ritorneremo al punto dove la funzione è stata chiamata. invece con jmp non teniamo conto di chi ha chiamato la funzione perché logicamente si vede che vogliamo andare ad un punto precisodel codice e andare avanti da lì senza tornare indietro.
 
 
-## Non solo purpose registers
-
-
 ## Studies todo
 
 - [x] what is the definition of linker?
@@ -280,3 +277,7 @@ Un'altra cosa che ho avuto modo di scoprire adesso è che la grande differenza d
 
 # Avaible "built in" registers
 ![alt text](image.png)
+
+# extra
+Max int for 64bit registers: 9,223,372,036,854,775,807
+After that it overflows, overflow meaning is that the value from a positive integer it becomes a negative one and viceversa this is a good criteria to check overflows
