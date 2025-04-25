@@ -235,7 +235,8 @@ For handling the "results" we have the **conditional jumps instructions:**
 * JGE - Jump if the first value is greater or equal to the second.
 * JA - The same as JG, but performs the unsigned comparison.
 * JAE - The same as JGE, but performs the unsigned comparison.
-
+* JL - jump if the value is smaller than the second
+* jo used in case a register goes in overflow
 In fact we have this C code
 ```c
 if (rax != 50) {
@@ -259,6 +260,10 @@ Allora, abbiamo scoperto più o meno in generale come funziona lo stack.
 Sappiamo che per esempio con **push** inseriamo dati al suo interno con degli indirizzi bassi e con **pop** sputiamo fuori l'ultimo valore che è stato inserito (LIFO).
 
 Teniamo anche conto di **call** e **ret** però, dove call chiama la procedura richiesta salvando come indirizzo di ritorno dekke istruzioni nello stack. **ret** invece, esce dalla procedura data, modifica lo stack rimuovendo l'indirizzo di ritorno e trasferendo nuovamente il "flow" di esecuzione prima di **call**
+
+### more about control flow (jmp and call)
+Un'altra cosa che ho avuto modo di scoprire adesso è che la grande differenza di usare l'istruzione **call** al posto di **jmp** è che in parole povere call lo si utilizza per andare da una parte del codice sapendo che quella parte lì possiede l'indirizzo del chiamante nello stack, di conseguenza quando useremo ret alla fine della funzione o "etichetta" se dobbiamo essere precisi, ritorneremo al punto dove la funzione è stata chiamata. invece con jmp non teniamo conto di chi ha chiamato la funzione perché logicamente si vede che vogliamo andare ad un punto precisodel codice e andare avanti da lì senza tornare indietro.
+
 
 ## Non solo purpose registers
 

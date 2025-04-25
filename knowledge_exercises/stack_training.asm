@@ -14,6 +14,12 @@ section .data
 	WRONG_ARGC_MSG	db "Error: expected two command-line arguments", 0xa
 	;; Length of the WRONG_ARGC_MSG message
 	WRONG_ARGC_MSG_LEN equ 42
+	NOT_NU	db "Error: expected a number (no signs allowed either)", 0xa
+	NOT_NU_MSG_LEN equ 50
+	NUMBER_RANGE_START equ 48
+	NUMBER_RANGE_END equ 57
+	OVERFLOW_MSG db "Overflow!!!", 0xa
+	OVERFLOW_MSG_LEN equ 11
 
 ;; Definition of the .text section
 section .text
@@ -48,6 +54,8 @@ _start:
 
 	;; Calculate the sum of the arguments. The result will be stored in the r10 register.
 	add r10, r11
+	cmp r10, 0
+	jl overflow_check
 	;; Move the sum value to the rax register.
 	mov rax, r10
 	;; Initialize counter by resetting it to 0. It will store the length of the result string.
@@ -83,6 +91,8 @@ __repeat:
 	je __return
 	;; Move the current character from the command-line argument to the bl register.
 	mov bl, [rsi]
+	;;i check that the passed value is a number in the ASCII table
+	call check_number
 	;; Subtract the value 48 from the ASCII code of the current character.
 	;; This will give us the numeric value of the character.
 	sub bl, 48
@@ -92,6 +102,8 @@ __repeat:
 	mul rcx
 	;; Add the next digit to our result number.
 	add rax, rbx
+	cmp rax, 0
+	jl overflow_check
 	;; Move to the next character in the command-line argument string.
 	inc rsi
 	;; Repeat until we reach the end of the string.
@@ -128,15 +140,15 @@ printResult:
 	;; Put the number of string characters to the rax register.
 	mov rax, rcx
 	;; Put the value 8 to the rcx register.
-	mov rcx, 1
+	mov rcx, 8
 	;; Calculate the number of bytes in the given string by multiplying rax by 8.
 	;; The result will be stored in the rax register.
 	mul rcx
 
 	;; Set the third argument to the length of the result string to print.
-	;; Pay attention even if it written here rdx for this architecture remains
+	;; Pay attention even if it is written here rdx for this architecture remains
 	;; the THIRD ARGUMENT goddamit
-	mov rdx, rcx
+	mov rdx, rax
 	;; Specify the system call number (1 is `sys_write`).
 	mov rax, SYS_WRITE
 	;; Set the first argument of `sys_write` to 1 (`stdout`).
@@ -156,7 +168,34 @@ printResult:
 	mov rdx, 1
 	;; Call the `sys_write` system call.
 	syscall
+	jmp exit
+;;function to check the various numbers before the conversion
+check_number:
+	;;we don't have && operator so we do 2 checks with the control flows
+	cmp bl, NUMBER_RANGE_START
+	jl not_number
 
+	cmp bl, NUMBER_RANGE_END
+	jg not_number
+
+	;;the number is in the range of the ascii values all good
+	ret
+
+overflow_check:
+	mov rax, SYS_WRITE
+	mov rdi, STD_OUT
+	mov rsi, OVERFLOW_MSG
+	mov rdx, OVERFLOW_MSG_LEN
+	syscall
+	jmp exit
+;;not a number is passed scenario
+not_number:
+	mov rax, SYS_WRITE
+
+	mov rdi, STD_OUT
+	mov rsi, NOT_NU
+	mov rdx, NOT_NU_MSG_LEN
+	syscall
 exit:
 	;; Specify the number of the system call (60 is `sys_exit`).
 	mov rax, SYS_EXIT
