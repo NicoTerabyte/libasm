@@ -1,5 +1,6 @@
 # libasm
 Getting familiar with assembly language
+![](goku_kid_buu_meme.gif)
 
 ## unknown stuff
 * We can say that the assembly language does work with makefiles
@@ -203,14 +204,14 @@ some basic sections are the following
 
 ## Arithmetic calculations:
 Basic list of arithmetic instructions used in assembly
-* ADD - Addition
-* SUB - Subtraction
-* MUL - Unsigned multiplication
-* IMUL - Signed multiplication
-* DIV - Unsigned division
-* IDIV - Signed division
-* INC - Increment
-* DEC - Decrement
+* ADD - Addition it does the operation on the first two operands that are written after it
+* SUB - Subtraction it does the operation on the first two operands that are written after it
+* MUL - Unsigned multiplication the result of the operation is stored on the rax and rdx registers
+* IMUL - Signed multiplication the result of the operation is stored on the rax and rdx registers
+* DIV - Unsigned division the result of the operation is stored on the rax and rdx registers
+* IDIV - Signed division the result of the operation is stored on the rax and rdx registers
+* INC - Increment by one the defined value
+* DEC - Decrement by one the defined value
 * NEG - Negation
 
 Very simple and chill to use it seems. I'll try to have one file for this kind of exercise though
@@ -264,6 +265,19 @@ Teniamo anche conto di **call** e **ret** però, dove call chiama la procedura r
 ### more about control flow (jmp and call)
 Un'altra cosa che ho avuto modo di scoprire adesso è che la grande differenza di usare l'istruzione **call** al posto di **jmp** è che in parole povere call lo si utilizza per andare da una parte del codice sapendo che quella parte lì possiede l'indirizzo del chiamante nello stack, di conseguenza quando useremo ret alla fine della funzione o "etichetta" se dobbiamo essere precisi, ritorneremo al punto dove la funzione è stata chiamata. invece con jmp non teniamo conto di chi ha chiamato la funzione perché logicamente si vede che vogliamo andare ad un punto precisodel codice e andare avanti da lì senza tornare indietro.
 
+## Logical instructions
+Used to perform logical operations.
+AND - entrambi le casistiche devono essere vere per rendere vero questa istruzione
+OR - basta che una delle due casistiche sia vere per essere anch'esso verò
+XOR - funziona solo se uno delle due casistiche è vero se no da sempre falso
+NOR - entrambe le casistche devono essere false per fare in modo che questa istruzione sia vera
+## cld and the flags reset
+
+Ok ho capito in parole povere ma neanche troppo, **cld** definisce come le stringhe vengono processate quando vengono fatte delle operazioni su di esse cambiando il valore del **df** (direction flag). Esempio stupido, se devo passare una stringa scritta come 'ABC' a un'altro registro con df = 0 la passo praticamente come l'ho scritta se invece df = 1 la passo al contrario e cioè 'CBA', movsb
+
+### Parte 4 recall:
+
+
 
 ## Studies todo
 
@@ -273,6 +287,8 @@ Un'altra cosa che ho avuto modo di scoprire adesso è che la grande differenza d
 - [x] understanding the mechanics of the functions made by yourself in the assembly language
 - [ ] fare un printer in assembly is it possible??? (extra)
 - [x] creating ft_strlen, it's pratically a test to see if you finally have a grasp of the function creation thing
+- [ ] Scoprire se è possibile collegare più files tra di loro in assembly e all'occorrenza snellire i file senza avere tutte le funzioni in un unico posto
+- [ ] Or start reading objdump's, che cos'è? E come può aiutarmi per raggiungere traguardi di grandezza assurdi?
 
 
 # Avaible "built in" registers
@@ -281,3 +297,10 @@ Un'altra cosa che ho avuto modo di scoprire adesso è che la grande differenza d
 # extra
 Max int for 64bit registers: 9,223,372,036,854,775,807
 After that it overflows, overflow meaning is that the value from a positive integer it becomes a negative one and viceversa this is a good criteria to check overflows
+
+
+# Little planning on what to do next:
+* finish the asm guide on github
+* then seeing if the knowledge that i got i'm able to do libasm (if not this task goes under the next one)
+* studying nasm
+* understanding how to use multiple files for an assembly project

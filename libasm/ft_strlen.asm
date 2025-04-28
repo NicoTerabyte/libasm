@@ -19,6 +19,7 @@ section .text
 
 
 _start:
+	cld
 	mov rdi, given_text
 	xor r10, r10
 	jmp ft_strlen
