@@ -10,7 +10,7 @@ Getting familiar with assembly language
 * The code must be compiled with nasm (correct is the actual compiler of assembly when it doesn't work with C functions)
 * What is the Intel syntax and what is the AT&T syntax that i can't use? (intel syntax is the most "modern" utilized since assembly changes  depending on the processors, AT&T was an old way of writing assembly)
 
-Can it be that the 64 bit programming that got mentioned in the subject is related to the fact that with assembly we are working on cpu's and by consequence the cpu works with 64 bits registers?
+Can it be that the 64 bit programming that got mentioned in the subject is related to the fact that with assembly we are working on cpu's and by consequence the cpu works with 64 bits registers? (yes)
 
 I can use something called **mov** values or something to manipulate the memory
 
@@ -24,14 +24,22 @@ Sappiamo sicuro che lavoriamo con l'architettura 86x64 bits, con l'architettura 
 Il problema è: come comprendo quando usare **mov**, **lea** ecc, qual'è il processo da seguire per scrivere in assembly? quale logica mi fa utilizzare variabili come rax, rdi, rsi?
 come dico a syscall di fare una determinata azione?
 
-Interessante prima di comprendere il linguaggio una piccola guida mi sta intimando a comprendere bene i calcoli tra i numeri binari le sottrazioni e i numeri negativi quando vengno rappresentati.
-Alla fine ho dovuto lasciare stare la guida perché utilizzava una vecchia architettura a 32 bits e quindi il codice in assembly era completamente diverso.
 Allora parlando con l'intelligenza artificiale ho potuto scoprire lo stile di architettura col quale dobbiamo programmare. IL  quale sarebbe NASM perché viene definito "intel style" e il subject menziona di dover programmare con questo stile quindi deduco che NASM sia appunto sta cosa qua.
 
-Assembly lavora con un comando built-in chiamato ld
-la sua sintassi è la seguente:
+## data transfer instructions
+Facendo tanta pratica abbiamo imparato i vari metodi per manipolare i dati nei registri ci sono tre modi
 
-### rdi, rax, rsi
+```assembly
+mov rdx, rsi ;;si copia il valore di rsi in rdx
+mov rdx, 10 ;; mette il valore 10 all'interno del registro rdx
+;;un po' particolare perché stiamo passando dati inerenti alla memoria qua
+mov [rdx], rsi mette nell'indirizzo di rdx il valore di rsi
+```
+esistono diversi tipi di istruzioni di tipo **mov** e hanno i loro casi di utilizzo.
+movsx --> serve per quando devi passare valori i quali hanno al loro interno dei segni (+/-)
+movzx --> serve per quando devi passare dei valori da un registro più piccolo ad uno più grande in pratica inizializzerebbe i bit non utilizzati nel registro più grande a 0 per evitare buchi.
+
+## rdi, rax, rsi
 Starting from a cpu perspective we know that  it is made to perform basic operations for the computer.
 So said operation may be, aritmetical, logical, input/output ones.
 The problem is where is the data of so said actions stored? In the general purpose registers.
@@ -208,14 +216,20 @@ Basic list of arithmetic instructions used in assembly
 * SUB - Subtraction it does the operation on the first two operands that are written after it
 * MUL - Unsigned multiplication the result of the operation is stored on the rax and rdx registers
 * IMUL - Signed multiplication the result of the operation is stored on the rax and rdx registers
-* DIV - Unsigned division the result of the operation is stored on the rax and rdx registers
+* DIV - Unsigned division the result of the operation is stored on the rax and rdx registers depending on the amount of bit involved it changes the storer of the result
 * IDIV - Signed division the result of the operation is stored on the rax and rdx registers
 * INC - Increment by one the defined value
 * DEC - Decrement by one the defined value
 * NEG - Negation
 
-Very simple and chill to use it seems. I'll try to have one file for this kind of exercise though
+Very simple and chill to use it seems. I'll try to have one file for this kind of exercise though.
 
+### Clarification for multiplications and divisions
+la moltiplicazione è molto semplice, in parole povere ogni qualvolta che facciampo l'istruzione MUL il valore che viene passato a MUL verrà sempre moltiplicato per il valore presente nel retgistro RAX.
+
+La divisione d'altro canto ha qualcosa di diverso. Una cosa che ho avuto modo di sperimentare nei giorni precedenti con il codice era il comportamento della divisione. In pratica l'istruzione DIV salva due valori in due registri predefiniti dove RAX si salva il risultato della divisione semplice e invece RDX si salva il resto della divisione. Interessante.
+RAX --> quoziente
+RDX --> resto
 
 ## control flow
 To put it simply is to handle the if elses statement like in the C language.
@@ -230,14 +244,18 @@ cmp rax, 50
 
 
 For handling the "results" we have the **conditional jumps instructions:**
-* JE/JZ - Jump if the values are equal.
-* JNE/JNZ - Jump if the values are not equal.
+* JE - Jump if the values are equal.
+* JNE - Jump if the values are not equal.
+* JZ and jnz jump if the previous comparison operation set zero flag to 1 or 0 (for more info check the Control transfer instructions part it deeper in this doc)
 * JG - Jump if the first value is greater than the second.
 * JGE - Jump if the first value is greater or equal to the second.
 * JA - The same as JG, but performs the unsigned comparison.
 * JAE - The same as JGE, but performs the unsigned comparison.
-* JL - jump if the value is smaller than the second
-* jo used in case a register goes in overflow
+* JL - jump if the first value is smaller than the second
+* jo used in case a register goes in overflow (didn't work well last time though)
+* jge and jle - Jump if the previous comparison operation resulted that one operand is greater (or equal) or smaller (or equal) than another.
+
+
 In fact we have this C code
 ```c
 if (rax != 50) {
@@ -271,13 +289,31 @@ AND - entrambi le casistiche devono essere vere per rendere vero questa istruzio
 OR - basta che una delle due casistiche sia vere per essere anch'esso verò
 XOR - funziona solo se uno delle due casistiche è vero se no da sempre falso
 NOR - entrambe le casistche devono essere false per fare in modo che questa istruzione sia vera
+
+
 ## cld and the flags reset
 
 Ok ho capito in parole povere ma neanche troppo, **cld** definisce come le stringhe vengono processate quando vengono fatte delle operazioni su di esse cambiando il valore del **df** (direction flag). Esempio stupido, se devo passare una stringa scritta come 'ABC' a un'altro registro con df = 0 la passo praticamente come l'ho scritta se invece df = 1 la passo al contrario e cioè 'CBA', movsb
 
-### Parte 4 recall:
+## Flags and checker registers
+This part is about the flags that gets triggered when the cmp instruction is used
+* zf --> zero flag set if the operands are equal to eachother
+* cf --> carry flag set when the result of an arithmetic instruction is too big to be stored in the place is going to be stored
+* sf --> sign flag Set if the result of an arithmetic instruction produced a value in which the most significant bit is set. praticamente determina in base alla composizione del valore se è un numero negativo (ci sono più 1 nel numero binario) o positivo (ci sono più zeri nel numero binario)
+* dl --> direction flag set when we want to flow strigns from the highest address to the lower ones
 
-
+## Strings behaviour
+Allora cosa abbiamo uisato con le stringhe nella lezione?
+lodsb non so bene a cosa serva, è direttamente collegato al registro rsi. praticamente prende il byte presente in rsi e lo carica sul registro al (in questo caso perché stiamo utilizzando lodsb), esista una vera e propria categoria per i lods ah e **ogni volta che utilizziamo lodsb esso INCREMENTERÀ automaticamente il puntatore di rsi**
+abbiamo scorso la nostra stringa un byte alla volta grazie al controllo per il contenuto del registro con le []
+esempio
+```assembly
+;; check che la stringa non sia stata conclusa
+cmp [rsi] byte 0
+;; dopo essermi assicurato che la lettera che devo prendere nell'intera stringa sia valida
+;; posso salvarla nel registro rax (al) grazie a lods
+lodsb
+```
 
 ## Studies todo
 
@@ -295,8 +331,10 @@ Ok ho capito in parole povere ma neanche troppo, **cld** definisce come le strin
 ![alt text](image.png)
 
 # extra
-Max int for 64bit registers: 9,223,372,036,854,775,807
-After that it overflows, overflow meaning is that the value from a positive integer it becomes a negative one and viceversa this is a good criteria to check overflows
+- Max int for 64bit registers: 9,223,372,036,854,775,807
+After that it overflows, overflow meaning is that the value from a positive integer it becomes a negative one and viceversa this is a good criteria to check overflows.
+
+- In case you would work with arguments given by terminal those are stored in the stack, just know that in order you will receive the number of arguments before the arguments.
 
 
 # Little planning on what to do next:
@@ -304,3 +342,5 @@ After that it overflows, overflow meaning is that the value from a positive inte
 * then seeing if the knowledge that i got i'm able to do libasm (if not this task goes under the next one)
 * studying nasm
 * understanding how to use multiple files for an assembly project
+
+# resources
