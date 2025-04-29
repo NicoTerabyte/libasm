@@ -201,6 +201,7 @@ set disassembly-flavor intel
 ```
 Possiamo anche fare dei comandi personalizzati volendo all'interno del .gdbinit file
 
+
 ## Sections
 utilized to give instruction to the program, they are mostly used to do different things like for example basic variable declaration or to actually tell to the computer where the program is gonna start.
 some basic sections are the following
@@ -321,11 +322,9 @@ lodsb
   A linker or link editor is a computer program that combines intermediate software build files such as object and library files into a single executable file such a program or library.
   Pratically we are using ld to make the object created by nasm into an executable it links together the object file to a program
 - [x] understanding the mechanics of the functions made by yourself in the assembly language
-- [ ] fare un printer in assembly is it possible??? (extra)
+- [x] fare un printer in assembly is it possible??? (extra)
 - [x] creating ft_strlen, it's pratically a test to see if you finally have a grasp of the function creation thing
 - [ ] Scoprire se è possibile collegare più files tra di loro in assembly e all'occorrenza snellire i file senza avere tutte le funzioni in un unico posto
-- [ ] Or start reading objdump's, che cos'è? E come può aiutarmi per raggiungere traguardi di grandezza assurdi?
-
 
 # Avaible "built in" registers
 ![alt text](image.png)
@@ -344,3 +343,8 @@ After that it overflows, overflow meaning is that the value from a positive inte
 * understanding how to use multiple files for an assembly project
 
 # resources
+A very good starting point to learn the language
+https://github.com/0xAX/asm
+
+
+
