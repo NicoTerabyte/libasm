@@ -107,6 +107,12 @@ Come ho menzionato implicitamente prima lo stack inserisce dei dati al suo inter
 
 _importante_
 Lo stack cresce verso il basso non verso l'alto a livello figurativo, in più, più roba viene inserita più l'indirizzo è basso? non ho ben capito cosa si intende so solo che si parla del valore dell'address di quel valore inserito nello stack.
+In realtà questo dettaglio è vitale per maneggiare i dati all'interno dello stack.
+Infatti una cosa molto interessante è che lo stack può allocare al prprio interno della memoria appunto per poter salvare delle variabili
+
+### How can you put stuff on a stack?
+Questo dipende dal tipo di variabile che vuoi inserire al suo interno nel senso che per inserire dati devi sempre allocare qualcosa nello stack. Per fare in modo che però lo stack sia pronto a ricevere dati devi allocare = fare una sottrazione al puntatore rsp. questa sottrazione **DEVE** essere un multiplo di 16 (regola di ABI) altrimenti ci potrebbe essere il rischio di un segfault a causa di un disallineamento nella memoria.
+Altra cosa veloce, di base rsp viene disallineato da rbp quando viene pushato all'inizio di una funzione quindi quando allochi, se vuoi farlo con una sola sottrazione devi tenere conto che quanto allochi dev'essere sommato a 8 e quella somma dev'essere un multiplo di 16
 
 
 ## The functions
@@ -120,7 +126,6 @@ sono tre in particolare
 **rbp** - this register is the so-called frame pointer or base pointer that points to the stack frame. As mentioned above, each function has its own stack frame, which is a memory area where the function stores local variables and other data.
 
 allora questi tre elementi sono particolari e ci sono **SEMPRE** nelle funzioni create da noi in linguaggio assembly servono a manipolare uno stack che appunto si crea appositamente per le interazioni che avvengono in quella funzione specifica.
-però approfondiremo domani champ rileggi il capitolo 2 e comprendi appieno rip, rsp e rbp.
 
 Allora l'idea generale di quei due registri è che rsp ha sempre accesso all'ultima variabile inserita nello stack quindi di per se è un registro dinamico perché è sempre in cambiamento.
 E molto importante, vengono utilizzati all'interno delle funzioni perché di fatto il valore di ritorno all'interno delle suddette viene salvato nello stack.
@@ -146,6 +151,8 @@ In sintesi: l'idea sarebbe che il rbp faccia quella determinata azione all'inizi
 ### Gli offset di rbp
 Allora se capisco questa cosa ho praticamente masterato le funzioni in assembly.
 La domanda è come calcolo l'offset all'interno di rbp per metterci dentro una variabile?
+forse questo l'ho finalmente capito. Praticamente l'offset è relativo alla variabile al suo interno, se parliamo di registri e quindi di puntatori sappiamo che l'offset per ogni puntatore è di 8 byte perché un puntatore è attualmente grande 8 byte.
+per quanto riguarda l'offset di un intero per esempio sappiamo che esso è grande 4 e di conseguenza per riuscire a sapere come prendere il valore da rbp dobbiamo andare in fondo agli indirizzi per un moltiplicatore di 4
 
 
 ### Considerazioni sulle "funzioni" in assembly
@@ -201,7 +208,43 @@ set disassembly-flavor intel
 ```
 Possiamo anche fare dei comandi personalizzati volendo all'interno del .gdbinit file
 
+**the x command** può anch'esso essere utilizzato all'interno del prompt di debug di gdb esso permette di visionare la memoria in diversi formati
 
+* d --> decimali
+* u --> unsigned int format
+* x --> esadecimali
+* t --> binario
+* g --> Treat as 8 bytes (64 bits) per unit (g is often used for 64-bit formats)(non ho capito)
+
+gli argomenti per specificare il formato vanno dopo la /
+praticamente si scriverebbe così
+```bash
+(gdb)x/d &value
+```
+
+### le convezioni ABI (definizione di ABI si trova sotto)
+1. come utilizzare lo stack (stack allignement)
+   * Prima di ogni call lo stack pointer (rsp) dev'essere allineato per un multiplo di 16 byte
+    * utile determinate istruzioni
+    * un disallineamento di questo regitro può potenzialmente causare segfaults
+2. utilizzo dei registri
+    * Registri volatili: caller-saved (modificabili dalle funzioni)
+      * rax, rcx, rdx, rsi, rdi, r8-r11, xmm0-xmm15
+    * Registri non volatili non chiamabili (vanno preservati)
+      * rbx, rbp, r12-r15
+3. Passaggio dei parametri
+     * Integer/pointer passati dai registri in quest'ordine
+       * rdi, rsi, rdx, rcx, r8, r9
+     * floating point values sono passati tramite xmm0-xmm7
+     * argomenti aggiuntivi vengono passati dallo stack
+4. valori di ritorno
+  * integer/pointer returned in rax
+  * floating-point returned in xmm0
+  * large structs returned into an hidden poiter in rdi
+
+#### Perché l'allineamento dello stack è importante
+* rischi un crash o un segfault se rsp non è allineato
+*
 ## Sections
 utilized to give instruction to the program, they are mostly used to do different things like for example basic variable declaration or to actually tell to the computer where the program is gonna start.
 some basic sections are the following
@@ -226,7 +269,7 @@ Basic list of arithmetic instructions used in assembly
 Very simple and chill to use it seems. I'll try to have one file for this kind of exercise though.
 
 ### Clarification for multiplications and divisions
-la moltiplicazione è molto semplice, in parole povere ogni qualvolta che facciampo l'istruzione MUL il valore che viene passato a MUL verrà sempre moltiplicato per il valore presente nel retgistro RAX.
+la moltiplicazione è molto semplice, in parole povere ogni qualvolta che facciampo l'istruzione MUL il valore che viene passato a MUL verrà sempre moltiplicato per il valore presente nel registro RAX.
 
 La divisione d'altro canto ha qualcosa di diverso. Una cosa che ho avuto modo di sperimentare nei giorni precedenti con il codice era il comportamento della divisione. In pratica l'istruzione DIV salva due valori in due registri predefiniti dove RAX si salva il risultato della divisione semplice e invece RDX si salva il resto della divisione. Interessante.
 RAX --> quoziente
@@ -279,7 +322,7 @@ jmp .bar
 Allora, abbiamo scoperto più o meno in generale come funziona lo stack.
 Sappiamo che per esempio con **push** inseriamo dati al suo interno con degli indirizzi bassi e con **pop** sputiamo fuori l'ultimo valore che è stato inserito (LIFO).
 
-Teniamo anche conto di **call** e **ret** però, dove call chiama la procedura richiesta salvando come indirizzo di ritorno dekke istruzioni nello stack. **ret** invece, esce dalla procedura data, modifica lo stack rimuovendo l'indirizzo di ritorno e trasferendo nuovamente il "flow" di esecuzione prima di **call**
+Teniamo anche conto di **call** e **ret** però, dove call chiama la procedura richiesta salvando come indirizzo di ritorno delle istruzioni nello stack. **ret** invece, esce dalla procedura data, modifica lo stack rimuovendo l'indirizzo di ritorno e trasferendo nuovamente il "flow" di esecuzione prima di **call**
 
 ### more about control flow (jmp and call)
 Un'altra cosa che ho avuto modo di scoprire adesso è che la grande differenza di usare l'istruzione **call** al posto di **jmp** è che in parole povere call lo si utilizza per andare da una parte del codice sapendo che quella parte lì possiede l'indirizzo del chiamante nello stack, di conseguenza quando useremo ret alla fine della funzione o "etichetta" se dobbiamo essere precisi, ritorneremo al punto dove la funzione è stata chiamata. invece con jmp non teniamo conto di chi ha chiamato la funzione perché logicamente si vede che vogliamo andare ad un punto precisodel codice e andare avanti da lì senza tornare indietro.
@@ -332,9 +375,9 @@ lodsb
 # extra
 - Max int for 64bit registers: 9,223,372,036,854,775,807
 After that it overflows, overflow meaning is that the value from a positive integer it becomes a negative one and viceversa this is a good criteria to check overflows.
-
+🗿
 - In case you would work with arguments given by terminal those are stored in the stack, just know that in order you will receive the number of arguments before the arguments.
-
+-The ABI requirement: Application Binary Interface -> sono delle regole per definire come il codice interagisce con i componenti macchina è una serie di convenzioni per come fare chiamate a funzioni, utilizzo di registri, management dello stack, data allignment.
 
 # Little planning on what to do next:
 * finish the asm guide on github
@@ -348,3 +391,4 @@ https://github.com/0xAX/asm
 
 
 
+# Cosa fare la prossima volta (per ricordarmi se no divento pazzo)🗿
