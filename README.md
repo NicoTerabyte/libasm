@@ -39,6 +39,9 @@ esistono diversi tipi di istruzioni di tipo **mov** e hanno i loro casi di utili
 movsx --> serve per quando devi passare valori i quali hanno al loro interno dei segni (+/-)
 movzx --> serve per quando devi passare dei valori da un registro più piccolo ad uno più grande in pratica inizializzerebbe i bit non utilizzati nel registro più grande a 0 per evitare buchi.
 
+
+e invece l'istruzione **lea** (load effective address) come funziona? allora praticamente lea serve sempre per muovere dati tra i vari registri o tra le variabili dichiarate in .data per esempio ma anziché muovere un valore effettivo come fa mov lea **prende l'indirizzo di quella variabile e la sposta nel registro apposito**.
+
 ## rdi, rax, rsi
 Starting from a cpu perspective we know that  it is made to perform basic operations for the computer.
 So said operation may be, aritmetical, logical, input/output ones.
@@ -359,6 +362,9 @@ cmp [rsi] byte 0
 lodsb
 ```
 
+## Interesting stuff to REALLY complete the project
+PIC (position independent code) un acronimo per definire il modo nel quale le istruzioni della macchina vengono eseguiti. Nel senso che essi verranno compilati ed eseguiti indipendentemente dal loro INDIRIZZO DI MEMORIA. 
+
 ## Studies todo
 
 - [x] what is the definition of linker?
@@ -389,6 +395,15 @@ After that it overflows, overflow meaning is that the value from a positive inte
 A very good starting point to learn the language
 https://github.com/0xAX/asm
 
+Another guide that even touches the advantages of using assembly for cybersecurity
+https://guyinatuxedo.github.io/index.html
+
+One of the most useful ones for beginners (it's made by the people that made the compiler for assembly)
+https://cs.lmu.edu/~ray/notes/nasmtutorial/
+
+
 
 
 # Cosa fare la prossima volta (per ricordarmi se no divento pazzo)🗿
+
+

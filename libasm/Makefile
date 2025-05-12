@@ -5,7 +5,7 @@ AR = ar rcs
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 
-SRC = ft_strlen.s ft_strcpy.s ft_strcmp.s
+SRC = ft_strlen.s ft_strcpy.s ft_strcmp.s ft_write.s
 OBJ = $(SRC:.s=.o)
 
 TEST_SRC = test.c

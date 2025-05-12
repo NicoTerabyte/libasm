@@ -12,37 +12,46 @@
 ;;This defined data is to help define the
 ;;lseek behaviour with the defined macro you can find in it's
 ;;man page
+default rel
+
+
 section .data
 	SEEK_SET equ 0
 	SEEK_CUR equ 1
 	SEEK_END equ 2
+	; strin db "ciao"
+	; TEXT_LEN equ 8
 
 
-section .bss
-	rlim_buf: resq 2 ;;this are the variable of the struct 8 byte each (there's two in it)
 
+section .note.GNU-stack noexec
 
 section .text
+	global _start
 	global ft_write
 
 ft_write:
-	;;function prologue
-	push rbp
-	mov rbp, rsp
-	;;we have three arguments in this function
-	;;rdi first, rsi second, rdx third
-	;;we use lseek to know where to write
-	;;syscall 8
-	;;we don't use rdi because it should have the fd in it already
-	mov r10, rsi
-	mov r8, rdx
-	mov rax, 8
-	mov rsi, 0
-	mov rdx, SEEK_CUR
+	mov rax, 1
 	syscall
-	;;i save the offset
-	mov r9, rax
+	cmp rax, 0
+	jl .error
+	ret
+.error:
+	extern __errno_location
+	neg rax
+	mov rdi, rax
+	call __errno_location wrt ..plt 
+	mov [rax], rdi
+	mov rax, -1
+	ret
 
-	mov rax, 97
 
 
+; _start:
+; 	mov rdi, 1
+; 	mov rsi, strin
+; 	mov rdx, TEXT_LEN
+; 	call ft_write
+; 	mov rax, 60
+; 	mov rdi, 1
+; 	syscall

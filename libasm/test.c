@@ -2,11 +2,12 @@
 #include <string.h>
 #include <assert.h>
 #include <fcntl.h>
+#include <sys/types.h>
 
 extern size_t ft_strlen(const char *s);
 extern char *ft_strcpy(char *dst, char *src);
 extern int ft_strcmp(const char *s, const char *s2);
-
+extern ssize_t ft_write(int fd, const void *buf, size_t count);
 void test_strlen()
 {
 	assert(ft_strlen("") == 0);
@@ -42,7 +43,12 @@ void test_strcmp()
 
 void test_write()
 {
-	
+	if (ft_write(1, "ciao\n", 5) == -1)
+		printf("something went wrong\n");
+	assert(ft_write(1, "ciao\n", 5) == 5);
+	ft_write(1, "dajeroma\n", 25);
+
+	printf("write test passed\n");
 }
 
 int main()
@@ -50,6 +56,7 @@ int main()
 	test_strlen();
 	test_strcpy();
 	test_strcmp();
+	test_write();
 	printf("all tests passed!\n");
 	return 0;
 }
