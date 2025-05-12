@@ -40,7 +40,7 @@ ft_write:
 	extern __errno_location
 	neg rax
 	mov rdi, rax
-	call __errno_location wrt ..plt 
+	call __errno_location wrt ..plt
 	mov [rax], rdi
 	mov rax, -1
 	ret
@@ -55,3 +55,7 @@ ft_write:
 ; 	mov rax, 60
 ; 	mov rdi, 1
 ; 	syscall
+
+;;for the future if you want you can add a checker to avoid
+;; an user that puts a count that is too big. BUT for the checks i did
+;; for now it seems to work properly
