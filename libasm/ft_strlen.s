@@ -16,5 +16,6 @@ ft_strlen:
 	jmp .count_size
 .done:
 	mov rax, r10
+	mov rsp, rbp
 	pop rbp
 	ret

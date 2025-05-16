@@ -1,5 +1,5 @@
 section .text
-	global ft_strcmp
+	global ft_strcmp:function
 
 ft_strcmp:
 	push rbp
@@ -24,5 +24,6 @@ ft_strcmp:
 	jne .set_result2
 	mov rax, 0
 .done:
+	mov rsp, rbp
 	pop rbp
 	ret

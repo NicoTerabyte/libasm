@@ -1,5 +1,5 @@
 section .text
-	global ft_strcpy
+	global ft_strcpy:function
 
 
 ft_strcpy:
@@ -18,5 +18,7 @@ ft_strcpy:
 	jmp .copy
 
 .done:
+	;;functio epilogue
+	mov rsp, rbp
 	pop rbp
 	ret

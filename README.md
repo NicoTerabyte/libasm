@@ -362,8 +362,9 @@ cmp [rsi] byte 0
 lodsb
 ```
 
-## Interesting stuff to REALLY complete the project
-PIC (position independent code) un acronimo per definire il modo nel quale le istruzioni della macchina vengono eseguiti. Nel senso che essi verranno compilati ed eseguiti indipendentemente dal loro INDIRIZZO DI MEMORIA. 
+## Interesting stuff for this and future projects
+PIC (position independent code) un acronimo per definire il modo nel quale le istruzioni della macchina vengono eseguiti. Nel senso che essi verranno compilati ed eseguiti indipendentemente dal loro INDIRIZZO DI MEMORIA. Allora nel contesto di assembly può essere usato in vari modi per migliorare e rendere più portabile il codice scritto.
+Serve sopratutto quando si usano librerie esterne visto che non sappiamo esattamente l'address di suddetta funzione dobbiamo affidarci a qualcosa per sapere la loro posizione relativa al nostro codice, questo accade graze alla procedure linkage table (PLT in breve) esso va a stanare per noi l'address di memoria della funzione di cui vogliamo usufruire. 
 
 ## Studies todo
 
