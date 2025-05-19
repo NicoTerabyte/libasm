@@ -419,5 +419,6 @@ https://cs.lmu.edu/~ray/notes/nasmtutorial/
 
 
 # Cosa fare la prossima volta (per ricordarmi se no divento pazzo)🗿
-
+Ottimo che abbiamo modificato a modo un po' il readme però ha effettivamente bisogno di essere letto tutto almeno una volta, poi abbiamo modificato strdup a modo e quindi non si tocca più.
+Abbiamo ancora da mettere l'ernno nelle altre funzioni, capire come il make file ci faccia funzioare con le flag -L. e -lasm il file C con le funzioni create aka libreria aka archivio e basta penso almeno per la prossima volta.
 
