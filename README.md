@@ -17,14 +17,8 @@ I can use something called **mov** values or something to manipulate the memory
 syscall can be used to make the computer do some operations when called, pratically the kernel it has defined codes to work out.
 
 ## Ok torniamo un attimo alla speculazione in italiano va
-La cosa difficile è capire come sta manipolazione di registri ci permetta di fare quello che vogliamo.
-Come le stampe e la manipolazione delle variabili o qualcosa del genere.
-Sappiamo sicuro che lavoriamo con l'architettura 86x64 bits, con l'architettura ARM classica tipo.
 
-Il problema è: come comprendo quando usare **mov**, **lea** ecc, qual'è il processo da seguire per scrivere in assembly? quale logica mi fa utilizzare variabili come rax, rdi, rsi?
-come dico a syscall di fare una determinata azione?
-
-Allora parlando con l'intelligenza artificiale ho potuto scoprire lo stile di architettura col quale dobbiamo programmare. IL  quale sarebbe NASM perché viene definito "intel style" e il subject menziona di dover programmare con questo stile quindi deduco che NASM sia appunto sta cosa qua.
+NASM è il compilatore per il linguaggio assembly per assemblare appunto il codice creado dei file oggetto i quali possono essere in seguito compilati per creare il file binario eseguibile.
 
 ## data transfer instructions
 Facendo tanta pratica abbiamo imparato i vari metodi per manipolare i dati nei registri ci sono tre modi
@@ -42,12 +36,14 @@ movzx --> serve per quando devi passare dei valori da un registro più piccolo a
 
 e invece l'istruzione **lea** (load effective address) come funziona? allora praticamente lea serve sempre per muovere dati tra i vari registri o tra le variabili dichiarate in .data per esempio ma anziché muovere un valore effettivo come fa mov lea **prende l'indirizzo di quella variabile e la sposta nel registro apposito**.
 
+Per creare un codice pulito seguendo le regole del PIC (position independent code) che dice di no toccare i valori nella sezione .data DIRETTAMENTE
+
 ## rdi, rax, rsi
 Starting from a cpu perspective we know that  it is made to perform basic operations for the computer.
 So said operation may be, aritmetical, logical, input/output ones.
 The problem is where is the data of so said actions stored? In the general purpose registers.
 And some of this registers are actually the rdi, rax, and rsi registers that are present to the 64 bits architecture.
-* rax -> handles the system call (syscall) number
+* rax -> handles the system call (syscall) number AND **update** stores the return results of the functions that are called VERY IMPORTANT
 * rdi -> used to pass the **first argument** to a **function**
 * rsi -> used to pass the **second argument** to a **function**
 * rdx -> used to pass the **third argument** to a **function**
@@ -67,11 +63,28 @@ and this way we create the actual object file for the ld that when used by it, i
 ```bash
 ld -o programName file.o
 ```
+And to be more correct in my opinion you could do
+
+```bash
+gcc -o programName file.o
+```
 
 and that's it actually
 
 ## Torniamo alla speculazione (passare dati nelle funzioni):
-assembly lavora con valori endian. la valutazione in endian determinano l'ordine nel quale il computer i bytes piccolo fact.
+assembly lavora con valori endian. la valutazione in endian determina l'ordine nel quale il computer legge i bytes in memoria piccolo fact.
+Determina anche come viene letto un indirizzo di memoria in base alla sua endianess
+* Little-endian:
+Il byte meno significativo (quello "più basso") viene memorizzato all’indirizzo più basso.
+Esempio: il valore 0x12345678 in memoria sarà memorizzato come 78 56 34 12 (dal byte all’indirizzo più basso a quello più alto).
+È usato da CPU come x86, x86-64, ARM in modalità little-endian.
+
+* Big-endian:
+Il byte più significativo (quello "più alto") viene memorizzato all’indirizzo più basso.
+Esempio: 0x12345678 sarà memorizzato come 12 34 56 78 in memoria.
+È usato da alcune architetture come Motorola 68k, PowerPC (in modalità big-endian).
+
+Nel nostro caso seguiamo le regole del little endian nella nostra architettura (86x64)
 
 Allora cosa interessante nell'architettura 86x64 ci sono dei registri chiamati per essere sempre in quest'ordine i registri che passano dei valori all'interno di una funzione.
 
@@ -364,7 +377,7 @@ lodsb
 
 ## Interesting stuff for this and future projects
 PIC (position independent code) un acronimo per definire il modo nel quale le istruzioni della macchina vengono eseguiti. Nel senso che essi verranno compilati ed eseguiti indipendentemente dal loro INDIRIZZO DI MEMORIA. Allora nel contesto di assembly può essere usato in vari modi per migliorare e rendere più portabile il codice scritto.
-Serve sopratutto quando si usano librerie esterne visto che non sappiamo esattamente l'address di suddetta funzione dobbiamo affidarci a qualcosa per sapere la loro posizione relativa al nostro codice, questo accade graze alla procedure linkage table (PLT in breve) esso va a stanare per noi l'address di memoria della funzione di cui vogliamo usufruire. 
+Serve sopratutto quando si usano librerie esterne visto che non sappiamo esattamente l'address di suddetta funzione dobbiamo affidarci a qualcosa per sapere la loro posizione relativa al nostro codice, questo accade graze alla procedure linkage table (PLT in breve) esso va a stanare per noi l'address di memoria della funzione di cui vogliamo usufruire.
 
 ## Studies todo
 

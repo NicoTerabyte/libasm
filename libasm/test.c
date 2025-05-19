@@ -4,12 +4,14 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
+#include <stdlib.h>
 
 extern size_t ft_strlen(const char *s);
 extern char *ft_strcpy(char *dst, char *src);
 extern int ft_strcmp(const char *s, const char *s2);
 extern ssize_t ft_write(int fd, const void *buf, size_t count);
 extern ssize_t ft_read(int fd, const void *buf, ssize_t count);
+extern char* ft_strdup(const char *str);
 
 void test_strlen()
 {
@@ -79,6 +81,22 @@ void test_read()
 	}
 }
 
+void test_strdup()
+{
+	char	*strToDup = "ciao bello";
+	char	*dupStr;
+
+	dupStr = ft_strdup(strToDup);
+	if (!dupStr)
+	{
+		printf("the test didn't went well\n");
+		free(dupStr);
+		return ;
+	}
+	printf("duplicated string: %s\n", dupStr);
+	free(dupStr);
+}
+
 int main()
 {
 	test_strlen();
@@ -86,6 +104,7 @@ int main()
 	test_strcmp();
 	test_write();
 	test_read();
+	test_strdup();
 	printf("all tests passed!\n");
 	return 0;
 }

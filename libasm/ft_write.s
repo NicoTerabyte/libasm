@@ -21,7 +21,7 @@ ft_write:
 	mov rsp, rbp
 	pop rbp
 	ret
-.error:
+ft_write.error:
 	extern __errno_location
 	;;we are gonna convert the rax register into a positive number
 	;;with this one🗣️🔥
