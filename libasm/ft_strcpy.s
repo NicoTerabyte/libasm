@@ -8,7 +8,7 @@ ft_strcpy:
 
 	mov rax, rdi
 .copy:
-	mov cl, BYTE [rsi] ;;get a character from src
+	mov cl, byte [rsi] ;;get a character from src
 	mov byte [rdi], cl ;;save the char to the destination
 	test cl, cl ;;i check if we reached the end of the string
 	jz .done
@@ -18,7 +18,7 @@ ft_strcpy:
 	jmp .copy
 
 .done:
-	;;functio epilogue
+	;;function epilogue
 	mov rsp, rbp
 	pop rbp
 	ret

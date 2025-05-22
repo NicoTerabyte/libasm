@@ -14,11 +14,16 @@ TEST_BIN = test_program
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(AR) $(NAME) $(OBJ)
+	$(AR) $(NAME) $(OBJ) # ar rcs libasm.a file1.o file2.o ...
 
 %.o: %.s
-	$(ASM) $(ASMFLAGS) $< -o $@
+	$(ASM) $(ASMFLAGS) $< -o $@  # nasm -f elf64 file.s -o file.o
 
+#the -L flag is for link the assemlby library to the c code
+#so it can use the function in the static library
+#the -lasm flag is to say to the linker to search for the
+#libasm.a library and to use that, i think it's a way to say to use
+#an assembly library
 test: $(NAME)
 	$(CC) $(CFLAGS) $(TEST_SRC) -L. -lasm -o $(TEST_BIN)
 	./$(TEST_BIN)

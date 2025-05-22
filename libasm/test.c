@@ -38,8 +38,8 @@ void test_strcmp()
 {
 
 	assert(ft_strcmp("hello", "hello") == 0);
-	assert(ft_strcmp("helloldkaldkl", "hello") == 1);
-	assert(ft_strcmp("hello", "helloldkaldkl") == -1);
+	assert(ft_strcmp("helloldkaldkl", "hello") >= 1);
+	assert(ft_strcmp("hello", "helloldkaldkl") <= -1);
 	assert(ft_strcmp("", "") == 0);
 
 	printf("✓ strcmp tests passed\n");

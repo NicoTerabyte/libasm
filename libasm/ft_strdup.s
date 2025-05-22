@@ -27,10 +27,6 @@ ft_strdup:
 
 .error:
 	extern __errno_location
-	;;we are gonna convert the rax register into a positive number
-	;;with this one🗣️🔥
-	;;because syscalls when it fails it gives us a negative number
-	;;but the errno function returns positive ones so....
 	call __errno_location wrt ..plt
 	mov [rax], rdi
 	mov rax, 0
@@ -53,7 +49,7 @@ ft_strdup:
 	jmp .cpy
 
 .done:
-	pop rdi
+	pop rax
 	mov rsp, rbp
 	pop rbp
 	ret

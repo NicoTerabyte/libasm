@@ -18,7 +18,7 @@ syscall can be used to make the computer do some operations when called, pratica
 
 ## Ok torniamo un attimo alla speculazione in italiano va
 
-NASM è il compilatore per il linguaggio assembly per assemblare appunto il codice creado dei file oggetto i quali possono essere in seguito compilati per creare il file binario eseguibile.
+NASM è il compilatore per il linguaggio assembly per assemblare appunto il codice creando dei file oggetto i quali possono essere in seguito compilati per creare il file binario eseguibile.
 
 ## data transfer instructions
 Facendo tanta pratica abbiamo imparato i vari metodi per manipolare i dati nei registri ci sono tre modi
@@ -34,9 +34,10 @@ movsx --> serve per quando devi passare valori i quali hanno al loro interno dei
 movzx --> serve per quando devi passare dei valori da un registro più piccolo ad uno più grande in pratica inizializzerebbe i bit non utilizzati nel registro più grande a 0 per evitare buchi.
 
 
-e invece l'istruzione **lea** (load effective address) come funziona? allora praticamente lea serve sempre per muovere dati tra i vari registri o tra le variabili dichiarate in .data per esempio ma anziché muovere un valore effettivo come fa mov lea **prende l'indirizzo di quella variabile e la sposta nel registro apposito**.
+e invece l'istruzione **lea** (load effective address) come funziona? allora praticamente lea serve sempre per muovere dati tra i vari registri o tra le variabili dichiarate in .data per esempio, ma anziché muovere un valore effettivo come fa mov lea **prende l'indirizzo di quella variabile e la sposta nel registro apposito**.
 
-Per creare un codice pulito seguendo le regole del PIC (position independent code) che dice di no toccare i valori nella sezione .data DIRETTAMENTE
+è ottima nel caso si voglia creare un codice pulito seguendo le regole del PIC (position independent code) che dice di non toccare i valori nella sezione .data DIRETTAMENTE. Lea permette di prendere dati in maniera relativa al dato a cui ci riferiamo senza provare ad usufruire della sua posizione assoluta che porterebbe dare problemi di sicurezza assurdi. Sopratutto per una questione di portabilità è comodo perché grazie alla ricezione dei dati in maniera relativa il codice può essere eseguito da qualsiasi macchina visto che i dati dipendono dall'ofset del registro RIP e non da dove sono piazzati nella memoria.
+RIP ha un ruolo fondamentale essendo che tiene l'indirizzo della prossima istruzione nel nostro programma ed è anche grazie a questo che riusciamo a ricavare degli indirizzi relativi visto che possiamo ricavarli indipendentente da dove ci troviamo nel programma
 
 ## rdi, rax, rsi
 Starting from a cpu perspective we know that  it is made to perform basic operations for the computer.
@@ -44,9 +45,9 @@ So said operation may be, aritmetical, logical, input/output ones.
 The problem is where is the data of so said actions stored? In the general purpose registers.
 And some of this registers are actually the rdi, rax, and rsi registers that are present to the 64 bits architecture.
 * rax -> handles the system call (syscall) number AND **update** stores the return results of the functions that are called VERY IMPORTANT
-* rdi -> used to pass the **first argument** to a **function**
-* rsi -> used to pass the **second argument** to a **function**
-* rdx -> used to pass the **third argument** to a **function**
+* rdi -> can be used to pass the **first argument** to a **function**
+* rsi -> can be used to pass the **second argument** to a **function**
+* rdx -> can be used to pass the **third argument** to a **function**
 
 
 ### small precautions
@@ -94,7 +95,7 @@ rdx - used to pass the third argument to a function.
 r10 - used to pass the fourth argument to a function.
 r8 - used to pass the fifth argument to a function.
 r9 - used to pass the sixth argument to a function.
-**rax** - gestisce il comportamento di syscall
+**rax** - gestisce il comportamento di syscall ed è anche il valore di ritorno
 
 Ma questo si applica solamente con le funzioni chiamate tramite syscall che per quello che dobbiamo fare per questo progetto calza a pennello.
 
@@ -111,7 +112,7 @@ DO - 16 bytes
 DY - 32 bytes
 DZ - 64 bytes
 
-Cioè è come se dicessimo nel codice dove abbiamo utilizzato db che ogni singola lettera di quella parola equivale ad un byte, questo comporta che prepareremo la parola ad essere grande quanto la sua lunghezza definita grazie a db. Utilizziamo db per definire le nostre variabili
+Cioè è come se dicessimo nel codice dove abbiamo utilizzato db che ogni singola lettera di quella parola equivale ad un byte, questo comporta che prepareremo la parola ad essere grande quanto la sua lunghezza definita grazie a db. Utilizziamo db per definire le nostre variabili invece per esempio essendo che gli interi sono definiti da 4 byte per definirili in maniera intelligente useremmo dd
 
 
 ## The stack
@@ -124,11 +125,12 @@ Come ho menzionato implicitamente prima lo stack inserisce dei dati al suo inter
 _importante_
 Lo stack cresce verso il basso non verso l'alto a livello figurativo, in più, più roba viene inserita più l'indirizzo è basso? non ho ben capito cosa si intende so solo che si parla del valore dell'address di quel valore inserito nello stack.
 In realtà questo dettaglio è vitale per maneggiare i dati all'interno dello stack.
-Infatti una cosa molto interessante è che lo stack può allocare al prprio interno della memoria appunto per poter salvare delle variabili
+Infatti una cosa molto interessante è che lo stack può allocare al prprio interno della memoria appunto per poter salvare delle variabili e come fa? beh bisogna sotrarre al registro rsp il valore in bytes che vogliamo allocare ma di solito questa operazione è rara e viene utilizzata solamente per dati specifici, semplicimente fare push dovrebbe bastare la cosa importante da sapere è maneggiare il registro rbp che è fisso e ancorato a un determinato punto dello stack, spesso SE SAI la grandezza della variabile e calcoli l'offset da rbp **puoi anche reperire la variabile che ti serve senza sputarla fuori dallo stack**.
 
 ### How can you put stuff on a stack?
 Questo dipende dal tipo di variabile che vuoi inserire al suo interno nel senso che per inserire dati devi sempre allocare qualcosa nello stack. Per fare in modo che però lo stack sia pronto a ricevere dati devi allocare = fare una sottrazione al puntatore rsp. questa sottrazione **DEVE** essere un multiplo di 16 (regola di ABI) altrimenti ci potrebbe essere il rischio di un segfault a causa di un disallineamento nella memoria.
-Altra cosa veloce, di base rsp viene disallineato da rbp quando viene pushato all'inizio di una funzione quindi quando allochi, se vuoi farlo con una sola sottrazione devi tenere conto che quanto allochi dev'essere sommato a 8 e quella somma dev'essere un multiplo di 16
+Altra cosa veloce, di base rsp viene disallineato da rbp quando viene pushato all'inizio di una funzione quindi quando allochi, se vuoi farlo con una sola sottrazione devi tenere conto che quanto allochi dev'essere sommato a 8 e quella somma dev'essere un multiplo di 16.
+Fino ad ora onestamente non ho avuto modo di sperimentare con questa storia dell'allineamento di rsp però molti codici che vengono disassemblati per essere letti in assembly fanno questa cosa quindi è comodo saperlo
 
 
 ## The functions
@@ -155,14 +157,14 @@ porco due mi sono dimenticato che quando lavoriamo coi registri è come se prima
 </span>
 
 ### Perché pushare rbp nello stack all'inizio di una funzione?
-L'operazione iniziale che viene spiegata dove rbp all'inizio quindi il *pushing* di rbp nello stack all'inizio di una funzione che viene chiamata è giustificato, praticamente serve a settare rbp per la funzione corrente essendo un registro "locale" viene usato anche prima in un'altra funzione di conseguenza ci salviamo nello stack il punto in cui rbp è arrivato questo comporta che possiamo poi inzializzarlo per utilizzarlo come base all'interno della nuova funzione fare tutte le operazioni necessarie poi resettare tutto "sputandolo" fuori dallo stack con pop.
+L'operazione iniziale che viene spiegata dove rbp all'inizio quindi il *pushing* di rbp nello stack all'inizio di una funzione che viene chiamata è giustificato, praticamente serve a settare rbp per la funzione corrente essendo un registro "locale" viene usato anche prima in un'altra funzione di conseguenza ci salviamo nello stack il punto in cui rbp è arrivato questo comporta che possiamo poi inzializzarlo per utilizzarlo come base all'interno della nuova. In parole semplici è come se in C hai una funzione con le sue variabili dichiarate in essa alla fine della funzione quelle variabili non vengono salvate sono utilizzate solamente all'interno di quella funzione, stessa cosa qui solo che resettiamo lo stack per utilizzarlo come variabile locale della funzione
 
 <span style="color: blue">
 <b>ricorda!</b>
 </span>
 
 Essendo che aggiungere valori allo stack li fa andare in indirizzi più bassi per accedere ai registri precedenti l'offset dev'essere negativo sono identificabili come **variabili locali**.
-In sintesi: l'idea sarebbe che il rbp faccia quella determinata azione all'inizio di una funzione perché così negli indirizzi più bassi, cioè quelli negativi, esso abbia le variabili locali cioè quelle salvate dal **caller**, d'altro canto se invece delle variabili venissero salvate nello stack esse sarebbero accessibili solamente tramite un **offset positivo** sommato all'indirizzo di rbp
+
 
 ### Gli offset di rbp
 Allora se capisco questa cosa ho praticamente masterato le funzioni in assembly.
@@ -172,9 +174,36 @@ per quanto riguarda l'offset di un intero per esempio sappiamo che esso è grand
 
 
 ### Considerazioni sulle "funzioni" in assembly
-alla fine della giornata le cosidette "funzioni" sono solo delle sezioni, da non confondere con le section stesse, che possiedono una loro "etichetta" (label sarebbe la terminologia adatta), e che vengono chiamate durante l'esecuzione del programma stesso. praticamente quello che succede in assembly è una serie di istruzioni che per conto loro vengono chiamate in un determinato ordine
-nel senso: Io devo fare x quindi salto (con jmp) alla sezione x per fare un'operazione che mi serve.
-Poi volendo posso tornare indietro (sempre con jmp jne se c'era un check che è andato male) e riparto da dove sono saltato andando verso il basso MA questo non mi impedisce di saltare di nuovo in sezione x oppure se operazione y è avvenuta di uscire grazie ad un altro salto. è un po' strano ma già vedendo la logica del codice "stack_training.asm" capirai
+Devo chiarire come si deve LE VERE funzioni vengono richiamate con l'istruzione call e per norma devono sempre avere la function prologue e epilogue perché lo stack dev'essere preparato esattamente per quella funzione, ed esse, vengono concluse dal ret il risultato della funzione poi viene salvato all'interno del registro **rax** sempre è proprio una regola assembly.
+esempio della creazione della funzione "ft_strlen" che al suo interno utilizza delle apposite etichette
+
+```assembly
+;;remember rax saves the return value of the assembly function
+;;CODDDUE
+
+section .text
+	global ft_strlen
+
+ft_strlen:
+	push rbp
+	mov rbp, rsp
+	xor r10, r10
+.count_size:
+	cmp byte [rdi], 0
+	je .done
+	inc r10
+	inc rdi
+	jmp .count_size
+.done:
+	mov rax, r10
+	mov rsp, rbp
+	pop rbp
+	ret
+
+```
+Una cosa di cui puoi disporre all'interno del programma sono appunto le etichette. Queste fungono da sezioni all'interno del codice e fanno parte della funzione che viene chiamata finché stanno sotto di essa eccenzion fatta nel caso sotto la funzione ce ne sia un'altra che a sua volta può viene chiamata con call perché ho notato che questa differenziazione avviene appena il codice viene compilato, solo se si usa call quella etichetta è in realtà una funzione
+
+
 
 ## Debugging sheet
 Qui mi segno qualche comando da utilizzare con gdb per capire meglio le operazioni fatte da assembly e non impazzire
@@ -242,12 +271,12 @@ praticamente si scriverebbe così
 1. come utilizzare lo stack (stack allignement)
    * Prima di ogni call lo stack pointer (rsp) dev'essere allineato per un multiplo di 16 byte
     * utile determinate istruzioni
-    * un disallineamento di questo regitro può potenzialmente causare segfaults
+    * un disallineamento di questo registro può potenzialmente causare segfaults
 2. utilizzo dei registri
     * Registri volatili: caller-saved (modificabili dalle funzioni)
       * rax, rcx, rdx, rsi, rdi, r8-r11, xmm0-xmm15
     * Registri non volatili non chiamabili (vanno preservati)
-      * rbx, rbp, r12-r15
+      * rbx, rbp, r12-r15, rsp, rip
 3. Passaggio dei parametri
      * Integer/pointer passati dai registri in quest'ordine
        * rdi, rsi, rdx, rcx, r8, r9
@@ -260,7 +289,7 @@ praticamente si scriverebbe così
 
 #### Perché l'allineamento dello stack è importante
 * rischi un crash o un segfault se rsp non è allineato
-*
+
 ## Sections
 utilized to give instruction to the program, they are mostly used to do different things like for example basic variable declaration or to actually tell to the computer where the program is gonna start.
 some basic sections are the following
@@ -287,7 +316,7 @@ Very simple and chill to use it seems. I'll try to have one file for this kind o
 ### Clarification for multiplications and divisions
 la moltiplicazione è molto semplice, in parole povere ogni qualvolta che facciampo l'istruzione MUL il valore che viene passato a MUL verrà sempre moltiplicato per il valore presente nel registro RAX.
 
-La divisione d'altro canto ha qualcosa di diverso. Una cosa che ho avuto modo di sperimentare nei giorni precedenti con il codice era il comportamento della divisione. In pratica l'istruzione DIV salva due valori in due registri predefiniti dove RAX si salva il risultato della divisione semplice e invece RDX si salva il resto della divisione. Interessante.
+La divisione d'altro canto ha qualcosa di diverso. Una cosa che ho avuto modo di sperimentare nei giorni precedenti con il codice era il comportamento della divisione. In pratica l'istruzione DIV salva due valori in due registri predefiniti dove RAX si salva il risultato della divisione semplice, invece RDX si salva il resto della divisione. Interessante.
 RAX --> quoziente
 RDX --> resto
 
@@ -297,7 +326,7 @@ To put it simply is to handle the if elses statement like in the C language.
 First of all we use the *cmp* directive to compare the registers with the given value.
 BUT! It can't work by itself because it does the check but it doens't say what to do after, for the result of the control flow statement we need to use other directives.
 Example of cmp usage
-```c
+```assembly
 ;; Compare the value of the rax register with 50
 cmp rax, 50
 ```
@@ -341,7 +370,10 @@ Sappiamo che per esempio con **push** inseriamo dati al suo interno con degli in
 Teniamo anche conto di **call** e **ret** però, dove call chiama la procedura richiesta salvando come indirizzo di ritorno delle istruzioni nello stack. **ret** invece, esce dalla procedura data, modifica lo stack rimuovendo l'indirizzo di ritorno e trasferendo nuovamente il "flow" di esecuzione prima di **call**
 
 ### more about control flow (jmp and call)
-Un'altra cosa che ho avuto modo di scoprire adesso è che la grande differenza di usare l'istruzione **call** al posto di **jmp** è che in parole povere call lo si utilizza per andare da una parte del codice sapendo che quella parte lì possiede l'indirizzo del chiamante nello stack, di conseguenza quando useremo ret alla fine della funzione o "etichetta" se dobbiamo essere precisi, ritorneremo al punto dove la funzione è stata chiamata. invece con jmp non teniamo conto di chi ha chiamato la funzione perché logicamente si vede che vogliamo andare ad un punto precisodel codice e andare avanti da lì senza tornare indietro.
+Un'altra cosa che ho avuto modo di scoprire adesso è che la grande differenza di usare l'istruzione **call** al posto di **jmp** è che in parole povere call lo si utilizza per andare da una parte del codice sapendo che quella parte lì possiede l'indirizzo del chiamante nello stack, di conseguenza quando useremo ret alla fine della funzione o "etichetta" se dobbiamo essere precisi, ritorneremo al punto dove la funzione è stata chiamata. invece con jmp non teniamo conto di chi ha chiamato la funzione perché logicamente si vede che vogliamo andare ad un punto preciso del codice e andare avanti da lì senza tornare indietro a meno non usiamo jmp di nuovo in una etichetta che anticipa quella sezione di codice che ha chiamato.
+
+**AGGIORNAMENTO**
+Una cosa da considerare, ogni cosa che viene triggerata con CALL può essere definita una funzione **indipendente** invece il resto può essere chiamato etichetta e queste avvengono SEMPRE in una funzione le funzioni devono sempre avere ciò che viene chiamato function prologue e epilogue che sono una procedura per avere lo stack disponibile per le variabili locali di quella funzione, che se ci pensi è come le variabili all'interno di una funzione, esse sono create la e muoiono la l'unica cosa che porti fuori da una funzione è il return, ci sono eccezioni quali il cambiamento di determinati dati nella funzione tramite indirizzo ma per questo progetto non viene approfondità come cosa
 
 ## Logical instructions
 Used to perform logical operations.
@@ -364,7 +396,7 @@ This part is about the flags that gets triggered when the cmp instruction is use
 
 ## Strings behaviour
 Allora cosa abbiamo uisato con le stringhe nella lezione?
-lodsb non so bene a cosa serva, è direttamente collegato al registro rsi. praticamente prende il byte presente in rsi e lo carica sul registro al (in questo caso perché stiamo utilizzando lodsb), esista una vera e propria categoria per i lods ah e **ogni volta che utilizziamo lodsb esso INCREMENTERÀ automaticamente il puntatore di rsi**
+lodsb non so bene a cosa serva, è direttamente collegato al registro rsi. praticamente prende il byte presente in rsi e lo carica sul registro al (in questo caso perché stiamo utilizzando lodsb), esiste una vera e propria categoria per i lods ah e **ogni volta che utilizziamo lodsb esso INCREMENTERÀ automaticamente il puntatore di rsi**
 abbiamo scorso la nostra stringa un byte alla volta grazie al controllo per il contenuto del registro con le []
 esempio
 ```assembly
@@ -377,7 +409,7 @@ lodsb
 
 ## Interesting stuff for this and future projects
 PIC (position independent code) un acronimo per definire il modo nel quale le istruzioni della macchina vengono eseguiti. Nel senso che essi verranno compilati ed eseguiti indipendentemente dal loro INDIRIZZO DI MEMORIA. Allora nel contesto di assembly può essere usato in vari modi per migliorare e rendere più portabile il codice scritto.
-Serve sopratutto quando si usano librerie esterne visto che non sappiamo esattamente l'address di suddetta funzione dobbiamo affidarci a qualcosa per sapere la loro posizione relativa al nostro codice, questo accade graze alla procedure linkage table (PLT in breve) esso va a stanare per noi l'address di memoria della funzione di cui vogliamo usufruire.
+Serve sopratutto quando si usano librerie esterne visto che non sappiamo esattamente l'address di suddetta funzione dobbiamo affidarci a qualcosa per sapere la loro posizione relativa al nostro codice, questo accade grazie alla procedure linkage table (PLT in breve) esso va a stanare per noi l'address di memoria della funzione di cui vogliamo usufruire. infatti quando vogliamo utilizzare una funzione esterna già esistente utilizzamo l'acronimo plt per dire che la stiamo prendendo da un indirizzo relativo
 
 ## Studies todo
 
@@ -419,6 +451,3 @@ https://cs.lmu.edu/~ray/notes/nasmtutorial/
 
 
 # Cosa fare la prossima volta (per ricordarmi se no divento pazzo)🗿
-Ottimo che abbiamo modificato a modo un po' il readme però ha effettivamente bisogno di essere letto tutto almeno una volta, poi abbiamo modificato strdup a modo e quindi non si tocca più.
-Abbiamo ancora da mettere l'ernno nelle altre funzioni, capire come il make file ci faccia funzioare con le flag -L. e -lasm il file C con le funzioni create aka libreria aka archivio e basta penso almeno per la prossima volta.
-

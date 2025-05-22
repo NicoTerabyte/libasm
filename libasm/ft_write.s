@@ -27,6 +27,9 @@ ft_write.error:
 	;;with this one🗣️🔥
 	;;because syscalls when it fails it gives us a negative number
 	;;but the errno function returns positive ones so....
+	;;wrt stands for with respect to that says the method on how the
+	;;address of the function should be calculated
+	;;that's why we are using plt that respects the position independent code idea
 	neg rax
 	mov rdi, rax
 	call __errno_location wrt ..plt
