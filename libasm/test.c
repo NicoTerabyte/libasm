@@ -18,7 +18,7 @@ void test_strlen()
 	assert(ft_strlen("") == 0);
 	assert(ft_strlen("hello") == 5);
 	assert(ft_strlen("this is a test") == 14);
-	printf("✓ Test passed\n");
+	printf("✓ ft_strlen tests passed\n");
 }
 
 void test_strcpy()
@@ -48,12 +48,12 @@ void test_strcmp()
 
 void test_write()
 {
-	if (ft_write(1, "ciao\n", 5) == -1)
+	if (ft_write(1, "hello\n", 6) == -1)
 		printf("something went wrong\n");
-	assert(ft_write(1, "ciao\n", 5) == 5);
-	ft_write(1, "dajeroma\n", 9);
+	assert(ft_write(1, "hello\n", 6) == 6);
+	ft_write(1, "dajeroma\n", 10);
 
-	printf("✓ write test passed\n");
+	printf("✓ ft_write tests passed\n");
 }
 
 void test_read()
@@ -63,7 +63,7 @@ void test_read()
 	size_t	bytes_read;
 	if (fd < 0)
 	{
-		printf("sei goofy e scemo, error on opening the file\n");
+		printf("you are goofy and a BIGASS, error on opening the file\n");
 		return ;
 	}
 
@@ -76,14 +76,15 @@ void test_read()
 	close(fd);
 	if (fd < 0)
 	{
-		printf("stiamo alla frutta\n");
+		printf("We are at frutta\n");
 		return ;
 	}
+	printf("✓ ft_read tests passed\n");
 }
 
 void test_strdup()
 {
-	char	*strToDup = "ciao bello";
+	char	*strToDup = "hello young lady";
 	char	*dupStr;
 
 	dupStr = ft_strdup(strToDup);
@@ -95,6 +96,7 @@ void test_strdup()
 	}
 	printf("duplicated string: %s\n", dupStr);
 	free(dupStr);
+	printf("✓ ft_strdup tests passed\n");
 }
 
 int main()
